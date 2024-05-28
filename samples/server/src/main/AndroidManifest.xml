@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application android:allowBackup="true">
+
+        <service
+            android:name=".CovesaLightService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="global.covesa.sdk.server.CovesaLightService.BIND" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".CovesaCatalogService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="global.covesa.sdk.server.CovesaCatalogService.BIND" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+    </application>
+
+</manifest>
