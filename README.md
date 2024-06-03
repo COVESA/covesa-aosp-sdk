@@ -3,5 +3,5 @@
 # covesa-aosp-sdk
 
 ### Maintainers
-Juhani Lehtimäki - Snapp Automotive
-José Freitas - FORVIA
+* Juhani Lehtimäki - Snapp Automotive
+* José Freitas - FORVIA
