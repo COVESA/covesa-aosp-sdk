@@ -69,6 +69,12 @@ class MainViewModel(
         }
     }
 
+    fun sendPushNotification() {
+        viewModelScope.launch {
+            MockApplicationServer(context).MockApi().sendNotification()
+        }
+    }
+
     fun registerPushService() {
         viewModelScope.launch {
             UnifiedPush.tryUseDefaultDistributor(context) {

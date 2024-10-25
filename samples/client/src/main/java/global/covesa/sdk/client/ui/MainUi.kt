@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import global.covesa.sdk.api.lights.LightColor
 import global.covesa.sdk.api.lights.LightState
 import global.covesa.sdk.client.MainViewModel
-import org.unifiedpush.android.connector.UnifiedPush
 import kotlin.random.Random
 
 @Composable
@@ -104,6 +103,14 @@ fun MainUi(viewModel: MainViewModel) {
                 }
             ) {
                 Text(text = "Unregister")
+            }
+            Button(
+                modifier = Modifier.padding(top = 32.dp),
+                onClick = {
+                    viewModel.sendPushNotification()
+                }
+            ) {
+                Text(text = "Notify")
             }
         } else {
             Text(

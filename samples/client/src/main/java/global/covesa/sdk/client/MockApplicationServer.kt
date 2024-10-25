@@ -4,10 +4,21 @@ import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import android.util.Log
+import com.android.volley.RequestQueue
+import com.android.volley.Response
+import com.android.volley.VolleyError
+import com.android.volley.toolbox.StringRequest
+import com.android.volley.toolbox.Volley
+import com.google.crypto.tink.apps.webpush.WebPushHybridEncrypt
+import org.json.JSONObject
 import org.unifiedpush.android.connector.UnifiedPush
 import org.unifiedpush.android.connector.data.PushEndpoint
+import java.net.URL
 import java.security.KeyPair
 import java.security.KeyPairGenerator
+import java.security.KeyStore
+import java.security.KeyStore.PrivateKeyEntry
+import java.security.Signature
 import java.security.interfaces.ECPublicKey
 import java.security.spec.ECGenParameterSpec
 
@@ -67,6 +78,90 @@ class MockApplicationServer(private val context: Context) {
                 // This store the generated key
                 ?: (genVapidKey().public as ECPublicKey).encode()
         }
+
+        /**
+         * Send a notification
+         */
+        fun sendNotification() {
+            sendWebPushNotification("This is a notification from server") { _, e ->
+                e?.let {
+                    Log.w(TAG, "An error occurred:", e)
+                }
+            }
+        }
+    }
+
+
+    /**
+     * Send a notification encrypted with RFC8291
+     */
+    private fun sendWebPushNotification(content: String, callback: (response: String?, error: VolleyError?) -> Unit) {
+        val requestQueue: RequestQueue = Volley.newRequestQueue(context)
+        val url = endpoint
+        val request = object :
+            StringRequest(
+                Method.POST,
+                url,
+                Response.Listener { r ->
+                    callback(r, null)
+                },
+                Response.ErrorListener { e ->
+                    callback(null, e)
+                },
+            ) {
+            override fun getBody(): ByteArray {
+                val auth = authSecret?.b64decode()
+                val hybridEncrypt =
+                    WebPushHybridEncrypt.Builder()
+                        .withAuthSecret(auth)
+                        .withRecipientPublicKey(pubKey?.decodePubKey() as ECPublicKey)
+                        .build()
+                return hybridEncrypt.encrypt(content.toByteArray(), null)
+            }
+
+            override fun getHeaders(): Map<String, String> {
+                val params: MutableMap<String, String> = HashMap()
+                params["Content-Encoding"] = "aes128gcm"
+                params["TTL"] = "60"
+                params["Urgency"] = "high"
+                params["Authorization"] = getVapidHeader()
+                return params
+            }
+        }
+        requestQueue.add(request)
+    }
+
+    /**
+     * Generate VAPID header for the endpoint, valid for 12h
+     *
+     * This is for the `Authorization` header.
+     *
+     * @return [String] "vapid t=$JWT,k=$PUBKEY"
+     */
+    private fun getVapidHeader(): String {
+        val endpointStr = endpoint ?: return ""
+        val header = JSONObject()
+            .put("alg", "ES256")
+            .put("typ", "JWT")
+            .toString().toByteArray(Charsets.UTF_8)
+            .b64encode()
+        val endpoint = URL(endpointStr)
+        val time12h = ((System.currentTimeMillis() / 1000) + 43200).toString() // +12h
+
+        /**
+         * [org.json.JSONStringer#string] Doesn't follow RFC, '/' = 0x2F doesn't have to be escaped
+         */
+        val body = JSONObject()
+            .put("aud", "${endpoint.protocol}://${endpoint.authority}")
+            .put("exp", time12h)
+            .toString()
+            .replace("\\/", "/")
+            .toByteArray(Charsets.UTF_8)
+            .b64encode()
+        val toSign = "$header.$body".toByteArray(Charsets.UTF_8)
+        val signature = sign(toSign)?.b64encode() ?: ""
+        val jwt = "$header.$body.$signature"
+        return "vapid t=$jwt,k=$vapidPubKey"
     }
 
     /**
@@ -90,6 +185,28 @@ class MockApplicationServer(private val context: Context) {
         }
     }
 
+    /**
+     * Sign [data] using the generated VAPID key pair
+     */
+    private fun sign(data: ByteArray): ByteArray? {
+        val ks = KeyStore.getInstance(KEYSTORE_PROVIDER).apply {
+            load(null)
+        }
+        if (!ks.containsAlias(ALIAS) || !ks.entryInstanceOf(ALIAS, PrivateKeyEntry::class.java)) {
+            // This should never be called. When we sign something, the key are already created.
+            genVapidKey()
+        }
+        val entry: KeyStore.Entry = ks.getEntry(ALIAS, null)
+        if (entry !is PrivateKeyEntry) {
+            Log.w(TAG, "Not an instance of a PrivateKeyEntry")
+            return null
+        }
+        return Signature.getInstance("SHA256withECDSA").run {
+            initSign(entry.privateKey)
+            update(data)
+            sign()
+        }
+    }
 
     private companion object {
         const val TAG = "MockApplicationServer"

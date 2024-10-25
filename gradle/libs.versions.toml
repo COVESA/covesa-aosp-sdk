@@ -12,6 +12,8 @@ activityCompose = "1.8.2"
 composeBom = "2024.02.02"
 unifiedpush = "3.0.0-rc2"
 eventbus = "3.3.1"
+volley = "1.2.1"
+tinkWebpush = "1.11.0"
 
 [libraries]
 agpGradleApi = { module = "com.android.tools.build:gradle-api", version.ref = "androidGradlePlugin" }
@@ -31,3 +33,5 @@ kotlinxCollectionsImmutable = { module = "org.jetbrains.kotlinx:kotlinx-collecti
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 unifiedpush = { group = "org.unifiedpush.android", name = "connector", version.ref = "unifiedpush"}
 eventbus = { group = "org.greenrobot", name = "eventbus", version.ref = "eventbus" }
+volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
+tink-webpush = { group = "com.google.crypto.tink", name = "apps-webpush", version.ref = "tinkWebpush"}

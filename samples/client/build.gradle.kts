@@ -18,6 +18,8 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.kotlinxCollectionsImmutable)
     implementation(libs.eventbus)
+    implementation(libs.volley)
+    implementation(libs.tink.webpush)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
