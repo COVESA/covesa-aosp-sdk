@@ -1,5 +1,6 @@
 package global.covesa.sdk.client
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -12,12 +13,15 @@ import global.covesa.sdk.client.ui.InstalledService
 import global.covesa.sdk.client.ui.InstalledServicesUiState
 import global.covesa.sdk.client.ui.LightServiceVersion
 import global.covesa.sdk.client.ui.LightsUiState
+import global.covesa.sdk.client.ui.PushUiState
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import org.unifiedpush.android.connector.UnifiedPush
 
 class MainViewModel(
+    private val context: Context,
     private val lightsServiceClient: LightsServiceClient,
     private val servicesCatalogClient: ServicesCatalogClient
 ) : ViewModel() {
@@ -25,6 +29,9 @@ class MainViewModel(
         private set
 
     var installedServicesUiState by mutableStateOf(InstalledServicesUiState())
+        private set
+
+    var pushUiState by mutableStateOf(PushUiState())
         private set
 
     init {
@@ -52,11 +59,35 @@ class MainViewModel(
                 }
             )
         }
+
+        refreshPushRegistration()
     }
 
     fun setInternalLight(lightState: LightState) {
         viewModelScope.launch {
             lightsServiceClient.setInternalLight(lightState)
+        }
+    }
+
+    fun registerPushService() {
+        viewModelScope.launch {
+            UnifiedPush.tryUseDefaultDistributor(context) {
+                UnifiedPush.registerApp(context)
+            }
+        }
+    }
+
+    fun unregisterPushService() {
+        viewModelScope.launch {
+            UnifiedPush.unregisterApp(context)
+            pushUiState = pushUiState.copy(registered = false)
+        }
+    }
+
+    fun refreshPushRegistration() {
+        viewModelScope.launch {
+            val registered = UnifiedPush.getAckDistributor(context) != null
+            pushUiState = pushUiState.copy(registered = registered)
         }
     }
 }

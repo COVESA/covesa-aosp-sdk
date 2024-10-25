@@ -11,6 +11,7 @@ lifecycleRuntimeKtx = "2.7.0"
 activityCompose = "1.8.2"
 composeBom = "2024.02.02"
 unifiedpush = "3.0.0-rc2"
+eventbus = "3.3.1"
 
 [libraries]
 agpGradleApi = { module = "com.android.tools.build:gradle-api", version.ref = "androidGradlePlugin" }
@@ -29,3 +30,4 @@ kotlinGradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", ver
 kotlinxCollectionsImmutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "collectionsImmutable" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 unifiedpush = { group = "org.unifiedpush.android", name = "connector", version.ref = "unifiedpush"}
+eventbus = { group = "org.greenrobot", name = "eventbus", version.ref = "eventbus" }
