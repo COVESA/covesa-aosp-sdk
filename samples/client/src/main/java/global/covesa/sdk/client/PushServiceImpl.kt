@@ -9,6 +9,7 @@ import org.unifiedpush.android.connector.data.PushMessage
 
 class PushServiceImpl: PushService() {
     override fun onNewEndpoint(context: Context, endpoint: PushEndpoint, instance: String) {
+        MockApplicationServer(context).MockApi().storePushEndpoint(endpoint)
         EventBus.getDefault().post(PushSubscriptionEvent())
     }
 
@@ -21,6 +22,7 @@ class PushServiceImpl: PushService() {
     }
 
     override fun onUnregistered(context: Context, instance: String) {
+        MockApplicationServer(context).MockApi().storePushEndpoint(null)
         EventBus.getDefault().post(PushSubscriptionEvent())
     }
 }

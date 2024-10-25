@@ -72,7 +72,7 @@ class MainViewModel(
     fun registerPushService() {
         viewModelScope.launch {
             UnifiedPush.tryUseDefaultDistributor(context) {
-                UnifiedPush.registerApp(context)
+                UnifiedPush.registerApp(context, vapid = MockApplicationServer(context).MockApi().getVapidPubKey())
             }
         }
     }
