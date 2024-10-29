@@ -18,10 +18,9 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import org.unifiedpush.android.connector.UnifiedPush
 
 class MainViewModel(
-    private val context: Context,
+    context: Context,
     private val lightsServiceClient: LightsServiceClient,
     private val servicesCatalogClient: ServicesCatalogClient
 ) : ViewModel() {
@@ -31,7 +30,7 @@ class MainViewModel(
     var installedServicesUiState by mutableStateOf(InstalledServicesUiState())
         private set
 
-    var pushUiState by mutableStateOf(PushUiState())
+    var pushUiState by mutableStateOf(PushUiState(context))
         private set
 
     init {
@@ -59,8 +58,11 @@ class MainViewModel(
                 }
             )
         }
-
-        refreshPushRegistration()
+        viewModelScope.launch {
+            EventBus.subscribe<PushSubscriptionEvent> {
+                pushUiState = pushUiState.copy(registered = it.registered)
+            }
+        }
     }
 
     fun setInternalLight(lightState: LightState) {
@@ -71,29 +73,20 @@ class MainViewModel(
 
     fun sendPushNotification() {
         viewModelScope.launch {
-            MockApplicationServer(context).MockApi().sendNotification()
+            EventBus.publish(ActionEvent(ActionEvent.Type.SendNotification))
         }
     }
 
     fun registerPushService() {
         viewModelScope.launch {
-            UnifiedPush.tryUseDefaultDistributor(context) {
-                UnifiedPush.registerApp(context, vapid = MockApplicationServer(context).MockApi().getVapidPubKey())
-            }
+            EventBus.publish(ActionEvent(ActionEvent.Type.RegisterPush))
         }
     }
 
     fun unregisterPushService() {
         viewModelScope.launch {
-            UnifiedPush.unregisterApp(context)
+            EventBus.publish(ActionEvent(ActionEvent.Type.UnregisterPush))
             pushUiState = pushUiState.copy(registered = false)
-        }
-    }
-
-    fun refreshPushRegistration() {
-        viewModelScope.launch {
-            val registered = UnifiedPush.getAckDistributor(context) != null
-            pushUiState = pushUiState.copy(registered = registered)
         }
     }
 }

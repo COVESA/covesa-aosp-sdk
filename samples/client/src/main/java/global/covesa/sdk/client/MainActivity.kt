@@ -8,20 +8,18 @@ import global.covesa.sdk.api.client.LightsServiceClient
 import global.covesa.sdk.api.client.ServicesCatalogClient
 import global.covesa.sdk.client.ui.MainUi
 import global.covesa.sdk.client.ui.theme.CovesaSDKTheme
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
-import org.greenrobot.eventbus.ThreadMode
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
-
-    private var viewModel: MainViewModel? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            viewModel = viewModel {
+            val viewModel: MainViewModel = viewModel {
                 MainViewModel(
                     context = this@MainActivity,
                     lightsServiceClient = LightsServiceClient(this@MainActivity),
@@ -30,23 +28,15 @@ class MainActivity : ComponentActivity() {
             }
 
             CovesaSDKTheme {
-                MainUi(viewModel!!)
+                MainUi(viewModel)
             }
         }
+        subscribeActions()
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onMessageEvent(event: PushSubscriptionEvent?) {
-        viewModel?.refreshPushRegistration()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        EventBus.getDefault().register(this);
-    }
-
-    override fun onStop() {
-        super.onStop()
-        EventBus.getDefault().unregister(this);
+    private fun subscribeActions() {
+        CoroutineScope(Dispatchers.IO).launch {
+            EventBus.subscribe<ActionEvent> { it.handleAction(this@MainActivity) }
+        }
     }
 }

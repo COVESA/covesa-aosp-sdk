@@ -1,4 +1,5 @@
 package global.covesa.sdk.client
 
-class PushSubscriptionEvent {
-}
+data class PushSubscriptionEvent(
+    val registered: Boolean
+)
