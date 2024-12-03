@@ -2,14 +2,14 @@ package global.covesa.sdk.client
 
 import android.content.Context
 import android.util.Log
-import global.covesa.sdk.api.client.PushService
+import global.covesa.sdk.api.client.push.FailedReason
+import global.covesa.sdk.api.client.push.PushEndpoint
+import global.covesa.sdk.api.client.push.PushMessage
+import global.covesa.sdk.api.client.push.PushService
 import global.covesa.sdk.client.ui.Notification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.unifiedpush.android.connector.FailedReason
-import org.unifiedpush.android.connector.data.PushEndpoint
-import org.unifiedpush.android.connector.data.PushMessage
 
 class PushServiceImpl: PushService() {
     override fun onNewEndpoint(context: Context, endpoint: PushEndpoint, instance: String) {

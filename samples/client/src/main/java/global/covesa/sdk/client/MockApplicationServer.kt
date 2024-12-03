@@ -10,9 +10,8 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.crypto.tink.apps.webpush.WebPushHybridEncrypt
+import global.covesa.sdk.api.client.push.PushEndpoint
 import org.json.JSONObject
-import org.unifiedpush.android.connector.UnifiedPush
-import org.unifiedpush.android.connector.data.PushEndpoint
 import java.net.URL
 import java.security.KeyPair
 import java.security.KeyPairGenerator

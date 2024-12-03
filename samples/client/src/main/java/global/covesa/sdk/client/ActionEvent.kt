@@ -1,7 +1,7 @@
 package global.covesa.sdk.client
 
 import android.app.Activity
-import org.unifiedpush.android.connector.UnifiedPush
+import global.covesa.sdk.api.client.push.PushManager
 
 class ActionEvent(private val type: Type) {
     enum class Type {
@@ -13,16 +13,16 @@ class ActionEvent(private val type: Type) {
     fun handleAction(activity: Activity) {
         when(type) {
             Type.RegisterPush -> registerPush(activity)
-            Type.UnregisterPush -> UnifiedPush.unregisterApp(activity)
+            Type.UnregisterPush -> PushManager.unregister(activity)
             Type.SendNotification -> MockApplicationServer(activity).MockApi().sendNotification()
         }
     }
 
     private fun registerPush(activity: Activity) {
-        UnifiedPush.tryUseCurrentOrDefaultDistributor(
+        PushManager.tryUseCurrentOrDefaultDistributor(
             activity
         ) {
-            UnifiedPush.registerApp(
+            PushManager.register(
                 activity,
                 vapid = MockApplicationServer(activity).MockApi().getVapidPubKey()
             )

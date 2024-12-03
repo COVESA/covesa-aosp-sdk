@@ -3,11 +3,14 @@ package global.covesa.sdk.api.client.internal
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import global.covesa.sdk.api.client.PushService
-import org.unifiedpush.android.connector.FailedReason
+import global.covesa.sdk.api.client.push.FailedReason
+import global.covesa.sdk.api.client.push.PushEndpoint
+import global.covesa.sdk.api.client.push.PushService
+import org.unifiedpush.android.connector.FailedReason as UFailedReason
 import org.unifiedpush.android.connector.MessagingReceiver
-import org.unifiedpush.android.connector.data.PushEndpoint
-import org.unifiedpush.android.connector.data.PushMessage
+import global.covesa.sdk.api.client.push.PushMessage
+import org.unifiedpush.android.connector.data.PushEndpoint as UPushEndpoint
+import org.unifiedpush.android.connector.data.PushMessage as UPushMessage
 
 /**
  * @hide
@@ -19,25 +22,25 @@ class PushReceiver: MessagingReceiver() {
         sendToService(context, instance, PushService.PushEventType.UNREGISTERED)
     }
 
-    override fun onMessage(context: Context, message: PushMessage, instance: String) {
+    override fun onMessage(context: Context, message: UPushMessage, instance: String) {
         if (!message.decrypted) {
             Log.w(TAG, "Received a message that can't be decrypted.")
             return
         }
         sendToService(context, instance, PushService.PushEventType.MESSAGE) { intent ->
-            intent.putExtra("message", message)
+            intent.putExtra("message", PushMessage(message))
         }
     }
 
-    override fun onNewEndpoint(context: Context, endpoint:PushEndpoint, instance: String) {
+    override fun onNewEndpoint(context: Context, endpoint: UPushEndpoint, instance: String) {
         sendToService(context, instance, PushService.PushEventType.NEW_ENDPOINT) { intent ->
-            intent.putExtra("endpoint", endpoint)
+            intent.putExtra("endpoint", PushEndpoint(endpoint))
         }
     }
 
-    override fun onRegistrationFailed(context: Context, reason: FailedReason, instance: String) {
+    override fun onRegistrationFailed(context: Context, reason: UFailedReason, instance: String) {
         sendToService(context, instance, PushService.PushEventType.NEW_ENDPOINT) { intent ->
-            intent.putExtra("reason", reason)
+            intent.putExtra("reason", FailedReason.fromUp(reason))
         }
     }
 

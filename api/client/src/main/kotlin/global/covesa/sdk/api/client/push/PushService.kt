@@ -1,4 +1,4 @@
-package global.covesa.sdk.api.client
+package global.covesa.sdk.api.client.push
 
 import android.app.Service
 import android.content.Context
@@ -6,9 +6,6 @@ import android.content.Intent
 import android.os.Build
 import android.os.IBinder
 import android.os.Parcelable
-import org.unifiedpush.android.connector.FailedReason
-import org.unifiedpush.android.connector.data.PushEndpoint
-import org.unifiedpush.android.connector.data.PushMessage
 import java.io.Serializable
 
 /**
@@ -25,7 +22,7 @@ import java.io.Serializable
  *     </intent-filter>
  * </service>
  * ```
- * You need to use [UnifiedPush][org.unifiedpush.android.connector.UnifiedPush] to register for push notifications.
+ * You need to use [PushManager] to register for push notifications.
  */
 abstract class PushService: Service() {
     /** Type of Push Event */

@@ -10,7 +10,7 @@ espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.7.0"
 activityCompose = "1.8.2"
 composeBom = "2024.02.02"
-unifiedpush = "3.0.0-rc2"
+unifiedpush = "3.0.0-rc3"
 volley = "1.2.1"
 tinkWebpush = "1.11.0"
 
