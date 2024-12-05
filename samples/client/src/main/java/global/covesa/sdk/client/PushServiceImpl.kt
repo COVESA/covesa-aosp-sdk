@@ -1,6 +1,5 @@
 package global.covesa.sdk.client
 
-import android.content.Context
 import android.util.Log
 import global.covesa.sdk.api.client.push.FailedReason
 import global.covesa.sdk.api.client.push.PushEndpoint
@@ -12,22 +11,22 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class PushServiceImpl: PushService() {
-    override fun onNewEndpoint(context: Context, endpoint: PushEndpoint, instance: String) {
-        MockApplicationServer(context).MockApi().storePushEndpoint(endpoint)
+    override fun onNewEndpoint(endpoint: PushEndpoint, instance: String) {
+        MockApplicationServer(this).MockApi().storePushEndpoint(endpoint)
         publishEvent(true)
     }
 
-    override fun onMessage(context: Context, message: PushMessage, instance: String) {
+    override fun onMessage(message: PushMessage, instance: String) {
         Log.d(TAG, "Received message: ${message.content.toString(Charsets.UTF_8)}")
-        Notification(context).showNotification("COVESA client sample", message.content.toString(Charsets.UTF_8))
+        Notification(this).showNotification("COVESA client sample", message.content.toString(Charsets.UTF_8))
     }
 
-    override fun onRegistrationFailed(context: Context, reason: FailedReason, instance: String) {
-        Notification(context).showNotification("Registration failed", "Can't register to the service: $reason")
+    override fun onRegistrationFailed(reason: FailedReason, instance: String) {
+        Notification(this).showNotification("Registration failed", "Can't register to the service: $reason")
     }
 
-    override fun onUnregistered(context: Context, instance: String) {
-        MockApplicationServer(context).MockApi().storePushEndpoint(null)
+    override fun onUnregistered(instance: String) {
+        MockApplicationServer(this).MockApi().storePushEndpoint(null)
         publishEvent(false)
     }
 
