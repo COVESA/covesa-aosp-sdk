@@ -4,6 +4,9 @@ import android.app.Service
 import android.content.Intent
 import android.os.Binder
 import android.os.IBinder
+import global.covesa.sdk.api.client.push.data.FailedReason
+import global.covesa.sdk.api.client.push.data.PushEndpoint
+import global.covesa.sdk.api.client.push.data.PushMessage
 
 /**
  * Service to receive UnifiedPush messages (new endpoints, unregistrations, push messages, errors) from the distributors
@@ -48,14 +51,10 @@ abstract class PushService: Service() {
 
     /**
      * @hide
-     * Return [binder] onBind
+     * Return [PushBinder] onBind
      */
     override fun onBind(intent: Intent?): IBinder? {
-        return synchronized(lock) {
-            binder ?: PushBinder().also {
-                binder = it
-            }
-        }
+        return PushBinder()
     }
 
     /**
@@ -80,7 +79,5 @@ abstract class PushService: Service() {
 
     internal companion object {
         const val ACTION_PUSH_EVENT = "global.covesa.sdk.PUSH_EVENT"
-        private var binder: PushBinder? = null
-        private val lock = Object()
     }
 }

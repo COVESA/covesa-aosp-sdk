@@ -1,4 +1,4 @@
-package global.covesa.sdk.api.client.push
+package global.covesa.sdk.api.client.push.data
 
 import org.unifiedpush.android.connector.FailedReason as UFailedReason
 

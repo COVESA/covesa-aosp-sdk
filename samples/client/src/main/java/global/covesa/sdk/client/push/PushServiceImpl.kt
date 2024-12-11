@@ -1,9 +1,9 @@
 package global.covesa.sdk.client.push
 
 import android.util.Log
-import global.covesa.sdk.api.client.push.FailedReason
-import global.covesa.sdk.api.client.push.PushEndpoint
-import global.covesa.sdk.api.client.push.PushMessage
+import global.covesa.sdk.api.client.push.data.FailedReason
+import global.covesa.sdk.api.client.push.data.PushEndpoint
+import global.covesa.sdk.api.client.push.data.PushMessage
 import global.covesa.sdk.api.client.push.PushService
 import global.covesa.sdk.client.ui.Notification
 import kotlinx.coroutines.CoroutineScope
