@@ -1,7 +1,9 @@
-package global.covesa.sdk.client
+package global.covesa.sdk.client.push
 
 import android.app.Activity
 import global.covesa.sdk.api.client.push.PushManager
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
 class ActionEvent(private val type: Type) {
     enum class Type {
@@ -26,6 +28,14 @@ class ActionEvent(private val type: Type) {
                 activity,
                 vapid = MockApplicationServer(activity).MockApi().getVapidPubKey()
             )
+        }
+    }
+
+    companion object {
+        private val _events = MutableSharedFlow<ActionEvent>()
+        val events = _events.asSharedFlow()
+        suspend fun emit(event: ActionEvent) {
+            _events.emit(event)
         }
     }
 }

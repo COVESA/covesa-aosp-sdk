@@ -1,4 +1,4 @@
-package global.covesa.sdk.client
+package global.covesa.sdk.client.push
 
 import android.util.Base64
 import com.google.crypto.tink.subtle.EllipticCurves

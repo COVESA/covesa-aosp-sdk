@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import global.covesa.sdk.api.client.LightsServiceClient
 import global.covesa.sdk.api.client.ServicesCatalogClient
 import global.covesa.sdk.api.lights.LightState
+import global.covesa.sdk.client.push.ActionEvent
+import global.covesa.sdk.client.push.PushServiceImpl
 import global.covesa.sdk.client.ui.InstalledService
 import global.covesa.sdk.client.ui.InstalledServicesUiState
 import global.covesa.sdk.client.ui.LightServiceVersion
@@ -20,7 +22,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    context: Context,
+    context: Context? = null,
     private val lightsServiceClient: LightsServiceClient,
     private val servicesCatalogClient: ServicesCatalogClient
 ) : ViewModel() {
@@ -30,7 +32,7 @@ class MainViewModel(
     var installedServicesUiState by mutableStateOf(InstalledServicesUiState())
         private set
 
-    var pushUiState by mutableStateOf(PushUiState(context))
+    var pushUiState by mutableStateOf(context?.let { PushUiState(it) } ?: PushUiState())
         private set
 
     init {
@@ -59,7 +61,7 @@ class MainViewModel(
             )
         }
         viewModelScope.launch {
-            EventBus.subscribe<PushSubscriptionEvent> {
+            PushServiceImpl.events.collect {
                 pushUiState = pushUiState.copy(registered = it.registered)
             }
         }
@@ -73,19 +75,19 @@ class MainViewModel(
 
     fun sendPushNotification() {
         viewModelScope.launch {
-            EventBus.publish(ActionEvent(ActionEvent.Type.SendNotification))
+            ActionEvent.emit(ActionEvent(ActionEvent.Type.SendNotification))
         }
     }
 
     fun registerPushService() {
         viewModelScope.launch {
-            EventBus.publish(ActionEvent(ActionEvent.Type.RegisterPush))
+            ActionEvent.emit(ActionEvent(ActionEvent.Type.RegisterPush))
         }
     }
 
     fun unregisterPushService() {
         viewModelScope.launch {
-            EventBus.publish(ActionEvent(ActionEvent.Type.UnregisterPush))
+            ActionEvent.emit(ActionEvent(ActionEvent.Type.UnregisterPush))
             pushUiState = pushUiState.copy(registered = false)
         }
     }

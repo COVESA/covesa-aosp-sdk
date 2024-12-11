@@ -1,4 +1,4 @@
-package global.covesa.sdk.client
+package global.covesa.sdk.client.push
 
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
@@ -10,7 +10,7 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.crypto.tink.apps.webpush.WebPushHybridEncrypt
-import global.covesa.sdk.api.client.push.PushEndpoint
+import global.covesa.sdk.api.client.push.data.PushEndpoint
 import org.json.JSONObject
 import java.net.URL
 import java.security.KeyPair
@@ -22,7 +22,8 @@ import java.security.interfaces.ECPublicKey
 import java.security.spec.ECGenParameterSpec
 
 /**
- * This class emulates an application server
+ * This class emulates an application server, this should not be implemented
+ * by real applications.
  */
 class MockApplicationServer(private val context: Context) {
 

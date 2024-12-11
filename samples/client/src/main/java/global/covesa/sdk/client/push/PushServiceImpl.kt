@@ -1,4 +1,4 @@
-package global.covesa.sdk.client
+package global.covesa.sdk.client.push
 
 import android.util.Log
 import global.covesa.sdk.api.client.push.FailedReason
@@ -8,12 +8,16 @@ import global.covesa.sdk.api.client.push.PushService
 import global.covesa.sdk.client.ui.Notification
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 
 class PushServiceImpl: PushService() {
+    class NewRegistrationState(val registered: Boolean)
+
     override fun onNewEndpoint(endpoint: PushEndpoint, instance: String) {
         MockApplicationServer(this).MockApi().storePushEndpoint(endpoint)
-        publishEvent(true)
+        updateRegistrationState(true)
     }
 
     override fun onMessage(message: PushMessage, instance: String) {
@@ -22,24 +26,27 @@ class PushServiceImpl: PushService() {
     }
 
     override fun onRegistrationFailed(reason: FailedReason, instance: String) {
+        Log.d(TAG, "Registration failed: $reason")
         Notification(this).showNotification("Registration failed", "Can't register to the service: $reason")
     }
 
     override fun onUnregistered(instance: String) {
         MockApplicationServer(this).MockApi().storePushEndpoint(null)
-        publishEvent(false)
+        updateRegistrationState(false)
     }
 
     /**
      * Update the UI
      */
-    private fun publishEvent(registered: Boolean) {
+    private fun updateRegistrationState(registered: Boolean) {
         CoroutineScope(Dispatchers.IO).launch {
-            EventBus.publish(PushSubscriptionEvent(registered))
+            _events.emit(NewRegistrationState(registered))
         }
     }
 
-    private companion object {
-        const val TAG = "PushServiceImpl"
+    companion object {
+        private const val TAG = "PushServiceImpl"
+        private val _events = MutableSharedFlow<NewRegistrationState>()
+        val events = _events.asSharedFlow()
     }
 }
