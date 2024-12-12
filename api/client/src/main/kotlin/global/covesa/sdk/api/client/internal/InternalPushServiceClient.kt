@@ -5,9 +5,6 @@ import android.content.Intent
 import android.os.IBinder
 import global.covesa.sdk.api.client.CovesaServiceClient
 import global.covesa.sdk.api.client.push.PushService
-import global.covesa.sdk.api.client.push.data.FailedReason
-import global.covesa.sdk.api.client.push.data.PushEndpoint
-import global.covesa.sdk.api.client.push.data.PushMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -19,6 +16,8 @@ internal class InternalPushServiceClient(
     context: Context,
     coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) : CovesaServiceClient<PushService.PushBinder>(context, coroutineScope, TAG) {
+
+    class ServiceNotFoundException(e: String = "Service not found") : Exception(e)
 
     private val packageName = context.packageName
 
@@ -33,27 +32,17 @@ internal class InternalPushServiceClient(
         }
     }
 
-    suspend fun newEndpoint(endpoint: PushEndpoint, instance: String) {
-        getService()?.onNewEndpoint(endpoint, instance)
-    }
-
-    suspend fun message(message: PushMessage, instance: String) {
-        getService()?.onMessage(message, instance)
-    }
-
-    suspend fun registrationFailed(reason: FailedReason, instance: String) {
-        getService()?.onRegistrationFailed(reason, instance)
-    }
-
-    suspend fun unregistered(instance: String) {
-        getService()?.onUnregistered(instance)
-    }
-
-    private suspend fun getService(): PushService? {
-        return remoteService.first()?.getService()
+    private suspend fun getService(): PushService {
+        return remoteService.first()?.getService() ?: throw ServiceNotFoundException()
     }
 
     companion object {
         private const val TAG = "InternalPushServiceClient"
+        private var service : PushService? = null
+        internal suspend fun getService(context: Context) : PushService {
+            return service ?: InternalPushServiceClient(context.applicationContext).getService().also {
+                service = it
+            }
+        }
     }
 }

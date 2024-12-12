@@ -22,25 +22,25 @@ class PushReceiver: MessagingReceiver() {
 
     override fun onUnregistered(context: Context, instance: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            InternalPushServiceClient(context).onUnregistered(instance)
+            InternalPushServiceClient.getService(context).onUnregistered(instance)
         }
     }
 
     override fun onMessage(context: Context, message: UPushMessage, instance: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            InternalPushServiceClient(context).onMessage(PushMessage(message), instance)
+            InternalPushServiceClient.getService(context).onMessage(PushMessage(message), instance)
         }
     }
 
     override fun onNewEndpoint(context: Context, endpoint: UPushEndpoint, instance: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            InternalPushServiceClient(context).onNewEndpoint(PushEndpoint(endpoint), instance)
+            InternalPushServiceClient.getService(context).onNewEndpoint(PushEndpoint(endpoint), instance)
         }
     }
 
     override fun onRegistrationFailed(context: Context, reason: UFailedReason, instance: String) {
         CoroutineScope(Dispatchers.IO).launch {
-            InternalPushServiceClient(context).onRegistrationFailed(FailedReason.fromUp(reason), instance)
+            InternalPushServiceClient.getService(context).onRegistrationFailed(FailedReason.fromUp(reason), instance)
         }
     }
 }
