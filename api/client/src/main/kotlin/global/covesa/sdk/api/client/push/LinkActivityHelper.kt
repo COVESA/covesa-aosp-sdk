@@ -16,7 +16,7 @@ import org.unifiedpush.android.connector.LinkActivityHelper as ULinkActivityHelp
  *
  * ```
  * class MyActivity: Activity() {
- *     /* ... */
+ *     [...]
  *     private val helper = LinkActivityHelper(this)
  *
  *     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +33,7 @@ import org.unifiedpush.android.connector.LinkActivityHelper as ULinkActivityHelp
  *            // An error occurred, consider no distributor found for the moment
  *         }
  *     }
- * /* ... */
+ * [...]
  * }
  * ```
  */

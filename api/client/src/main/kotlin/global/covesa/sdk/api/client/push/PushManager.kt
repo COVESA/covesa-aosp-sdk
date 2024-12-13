@@ -39,7 +39,7 @@ import org.unifiedpush.android.connector.UnifiedPush
  *
  * ```kotlin
  * import org.unifiedpush.android.connector.UnifiedPush
- * /* ... */
+ * [...]
  *
  * UnifiedPush.tryUseCurrentOrDefaultDistributor(context) { success ->
  *     if (success) {
@@ -60,7 +60,7 @@ import org.unifiedpush.android.connector.UnifiedPush
  * ```java
  * import static org.unifiedpush.android.connector.ConstantsKt.INSTANCE_DEFAULT;
  * import org.unifiedpush.android.connector.UnifiedPush;
- * /* ... */
+ * [...]
  *
  * UnifiedPush.tryUseCurrentOrDefaultDistributor(context, success ->{
  *     if (success) {
@@ -108,7 +108,7 @@ import org.unifiedpush.android.connector.UnifiedPush
  *
  * ```kotlin
  * import org.unifiedpush.android.connector.UnifiedPush
- * /* ... */
+ * [...]
  *
  * // Get a list of distributors that are available
  * val distributors = UnifiedPush.getDistributors(context)
@@ -130,7 +130,7 @@ import org.unifiedpush.android.connector.UnifiedPush
  * ```java
  * import static org.unifiedpush.android.connector.ConstantsKt.INSTANCE_DEFAULT;
  * import org.unifiedpush.android.connector.UnifiedPush;
- * /* ... */
+ * [...]
  *
  * // Get a list of distributors that are available
  * List<String> distributors = UnifiedPush.getDistributors(context);
