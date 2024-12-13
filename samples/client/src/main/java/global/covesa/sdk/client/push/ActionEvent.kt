@@ -23,11 +23,13 @@ class ActionEvent(private val type: Type) {
     private fun registerPush(activity: Activity) {
         PushManager.tryUseCurrentOrDefaultDistributor(
             activity
-        ) {
-            PushManager.register(
-                activity,
-                vapid = FakeApplicationServer(activity).MockApi().getVapidPubKey()
-            )
+        ) { success ->
+            if (success) {
+                PushManager.register(
+                    activity,
+                    vapid = FakeApplicationServer(activity).MockApi().getVapidPubKey()
+                )
+            }
         }
     }
 
