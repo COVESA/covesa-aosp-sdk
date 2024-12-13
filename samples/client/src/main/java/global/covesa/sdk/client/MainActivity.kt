@@ -11,7 +11,6 @@ import global.covesa.sdk.client.ui.MainUi
 import global.covesa.sdk.client.ui.theme.CovesaSDKTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 
