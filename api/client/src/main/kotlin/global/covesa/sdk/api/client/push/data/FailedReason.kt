@@ -3,7 +3,7 @@ package global.covesa.sdk.api.client.push.data
 import org.unifiedpush.android.connector.FailedReason as UFailedReason
 
 /**
- * A [registration request][TODO()] may fail for different reasons.
+ * A [registration request][global.covesa.sdk.api.client.push.PushManager.register] may fail for different reasons.
  */
 enum class FailedReason {
     /**
