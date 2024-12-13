@@ -173,7 +173,6 @@ object PushManager {
      *
      * @throws [VapidNotValidException] if [vapid] is not in the in the uncompressed form and base64url encoded.
      */
-    @JvmStatic
     @Throws(VapidNotValidException::class)
     fun register(
         context: Context,
@@ -196,7 +195,6 @@ object PushManager {
      * @param [context] To interact with the shared preferences and send broadcast intents.
      * @param [instance] Registration instance. Can be used to get multiple registrations, eg. for multi-account support.
      */
-    @JvmStatic
     fun unregister(
         context: Context,
         instance: String = INSTANCE_DEFAULT,
@@ -209,7 +207,6 @@ object PushManager {
      *
      * @return The list of distributor's package name
      */
-    @JvmStatic
     fun getDistributors(context: Context): List<String> {
         return UnifiedPush.getDistributors(context)
     }
@@ -250,7 +247,6 @@ object PushManager {
      * @param [callback] is a function taking a Boolean as parameter. This boolean is
      * true if the registration using the deeplink succeeded.
      */
-    @JvmStatic
     fun tryUseDefaultDistributor(
         context: Context,
         callback: (Boolean) -> Unit,
@@ -298,7 +294,6 @@ object PushManager {
      * @param [callback] is a function taking a Boolean as parameter. This boolean is
      * true if the registration using the deeplink succeeded.
      */
-    @JvmStatic
     fun tryUseCurrentOrDefaultDistributor(context: Context, callback: (Boolean) -> Unit) {
         return UnifiedPush.tryUseCurrentOrDefaultDistributor(context, callback)
     }
@@ -309,7 +304,6 @@ object PushManager {
      * @param [context] To interact with the shared preferences.
      * @param [distributor] The distributor package name
      */
-    @JvmStatic
     fun saveDistributor(context: Context, distributor: String) {
         UnifiedPush.saveDistributor(context, distributor)
     }
@@ -323,7 +317,6 @@ object PushManager {
      *
      * @return The distributor package name if any, else null
      */
-    @JvmStatic
     fun getSavedDistributor(context: Context): String? = UnifiedPush.getSavedDistributor(context)
 
     /**
@@ -335,7 +328,6 @@ object PushManager {
      *
      * @return The distributor package name if any, else null
      */
-    @JvmStatic
     fun getAckDistributor(context: Context): String? = UnifiedPush.getAckDistributor(context)
 
 
@@ -344,7 +336,6 @@ object PushManager {
      *
      * @param [context] To interact with the shared preferences and send broadcast intents.
      */
-    @JvmStatic
     fun removeDistributor(context: Context) = UnifiedPush.forceRemoveDistributor(context)
 
     /**
