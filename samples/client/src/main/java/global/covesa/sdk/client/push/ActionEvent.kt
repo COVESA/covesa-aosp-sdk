@@ -16,7 +16,7 @@ class ActionEvent(private val type: Type) {
         when(type) {
             Type.RegisterPush -> registerPush(activity)
             Type.UnregisterPush -> PushManager.unregister(activity)
-            Type.SendNotification -> MockApplicationServer(activity).MockApi().sendNotification()
+            Type.SendNotification -> FakeApplicationServer(activity).MockApi().sendNotification()
         }
     }
 
@@ -26,7 +26,7 @@ class ActionEvent(private val type: Type) {
         ) {
             PushManager.register(
                 activity,
-                vapid = MockApplicationServer(activity).MockApi().getVapidPubKey()
+                vapid = FakeApplicationServer(activity).MockApi().getVapidPubKey()
             )
         }
     }

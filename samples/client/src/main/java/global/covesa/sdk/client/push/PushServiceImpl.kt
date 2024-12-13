@@ -16,7 +16,7 @@ class PushServiceImpl: PushService() {
     class NewRegistrationState(val registered: Boolean)
 
     override fun onNewEndpoint(endpoint: PushEndpoint, instance: String) {
-        MockApplicationServer(this).MockApi().storePushEndpoint(endpoint)
+        FakeApplicationServer(this).MockApi().storePushEndpoint(endpoint)
         updateRegistrationState(true)
     }
 
@@ -31,7 +31,7 @@ class PushServiceImpl: PushService() {
     }
 
     override fun onUnregistered(instance: String) {
-        MockApplicationServer(this).MockApi().storePushEndpoint(null)
+        FakeApplicationServer(this).MockApi().storePushEndpoint(null)
         updateRegistrationState(false)
     }
 

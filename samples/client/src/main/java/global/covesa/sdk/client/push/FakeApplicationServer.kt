@@ -25,7 +25,7 @@ import java.security.spec.ECGenParameterSpec
  * This class emulates an application server, this should not be implemented
  * by real applications.
  */
-class MockApplicationServer(private val context: Context) {
+class FakeApplicationServer(private val context: Context) {
 
     private val prefs = context.getSharedPreferences(PREF_MASTER, Context.MODE_PRIVATE)
 
@@ -65,7 +65,7 @@ class MockApplicationServer(private val context: Context) {
          * This function should actually send to the server, here we just save locally
          */
         fun storePushEndpoint(endpoint: PushEndpoint?) {
-            this@MockApplicationServer.endpoint = endpoint?.url
+            this@FakeApplicationServer.endpoint = endpoint?.url
             authSecret = endpoint?.pubKeySet?.auth
             pubKey = endpoint?.pubKeySet?.pubKey
         }

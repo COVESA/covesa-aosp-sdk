@@ -17,8 +17,11 @@ dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.material3)
     implementation(libs.kotlinxCollectionsImmutable)
+
+    /** Used by the [FakeApplicationServer][global.covesa.sdk.client.push.FakeApplicationServer] */
     implementation(libs.volley)
     implementation(libs.tink.webpush)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
