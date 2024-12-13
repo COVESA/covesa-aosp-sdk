@@ -6,31 +6,29 @@ import global.covesa.sdk.api.client.push.data.PushEndpoint
 import global.covesa.sdk.api.client.push.data.PushMessage
 import global.covesa.sdk.api.client.push.PushService
 import global.covesa.sdk.client.ui.Notification
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.launch
 
 class PushServiceImpl: PushService() {
     class NewRegistrationState(val registered: Boolean)
 
-    override fun onNewEndpoint(endpoint: PushEndpoint, instance: String) {
+    override suspend fun onNewEndpoint(endpoint: PushEndpoint, instance: String) {
         FakeApplicationServer(this).MockApi().storePushEndpoint(endpoint)
         updateRegistrationState(true)
     }
 
-    override fun onMessage(message: PushMessage, instance: String) {
+    override suspend fun onMessage(message: PushMessage, instance: String) {
         Log.d(TAG, "Received message: ${message.content.toString(Charsets.UTF_8)}")
         Notification(this).showNotification("COVESA client sample", message.content.toString(Charsets.UTF_8))
+        updateRegistrationState(true)
     }
 
-    override fun onRegistrationFailed(reason: FailedReason, instance: String) {
+    override suspend fun onRegistrationFailed(reason: FailedReason, instance: String) {
         Log.d(TAG, "Registration failed: $reason")
         Notification(this).showNotification("Registration failed", "Can't register to the service: $reason")
     }
 
-    override fun onUnregistered(instance: String) {
+    override suspend fun onUnregistered(instance: String) {
         FakeApplicationServer(this).MockApi().storePushEndpoint(null)
         updateRegistrationState(false)
     }
@@ -38,10 +36,8 @@ class PushServiceImpl: PushService() {
     /**
      * Update the UI
      */
-    private fun updateRegistrationState(registered: Boolean) {
-        CoroutineScope(Dispatchers.IO).launch {
-            _events.emit(NewRegistrationState(registered))
-        }
+    private suspend fun updateRegistrationState(registered: Boolean) {
+        _events.emit(NewRegistrationState(registered))
     }
 
     companion object {

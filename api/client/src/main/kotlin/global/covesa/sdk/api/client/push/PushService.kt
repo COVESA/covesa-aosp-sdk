@@ -30,24 +30,24 @@ abstract class PushService: Service() {
      * should be send to the application server, and the app should sync for
      * missing notifications.
      */
-    abstract fun onNewEndpoint(endpoint: PushEndpoint, instance: String)
+    abstract suspend fun onNewEndpoint(endpoint: PushEndpoint, instance: String)
 
     /**
      * A new message is received. The message contains the decrypted content of the push message
      * for the instance
      */
-    abstract fun onMessage(message: PushMessage, instance: String)
+    abstract suspend fun onMessage(message: PushMessage, instance: String)
 
     /**
      * The registration is not possible, eg. no network, depending on the reason,
      * you can try to register again directly.
      */
-    abstract fun onRegistrationFailed(reason: FailedReason, instance: String)
+    abstract suspend fun onRegistrationFailed(reason: FailedReason, instance: String)
 
     /**
      * This application is unregistered by the distributor from receiving push messages
      */
-    abstract fun onUnregistered(instance: String)
+    abstract suspend fun onUnregistered(instance: String)
 
     /**
      * @hide
