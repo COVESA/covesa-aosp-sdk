@@ -12,10 +12,13 @@ import global.covesa.sdk.client.ui.PushUiState
 import global.covesa.sdk.client.ui.theme.CovesaSDKTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
 
 class MainActivity : ComponentActivity() {
+
+    private var job : Job? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,8 +39,14 @@ class MainActivity : ComponentActivity() {
         subscribeActions()
     }
 
+    override fun onDestroy() {
+        job?.cancel()
+        job = null
+        super.onDestroy()
+    }
+
     private fun subscribeActions() {
-        CoroutineScope(Dispatchers.IO).launch {
+        job = CoroutineScope(Dispatchers.IO).launch {
             ActionEvent.events.collect {
                 it.handleAction(this@MainActivity)
             }
