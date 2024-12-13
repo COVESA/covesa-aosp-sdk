@@ -8,6 +8,7 @@ import global.covesa.sdk.api.client.LightsServiceClient
 import global.covesa.sdk.api.client.ServicesCatalogClient
 import global.covesa.sdk.client.push.ActionEvent
 import global.covesa.sdk.client.ui.MainUi
+import global.covesa.sdk.client.ui.PushUiState
 import global.covesa.sdk.client.ui.theme.CovesaSDKTheme
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -22,7 +23,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val viewModel: MainViewModel = viewModel {
                 MainViewModel(
-                    context = this@MainActivity,
+                    pushUiState = PushUiState(this@MainActivity),
                     lightsServiceClient = LightsServiceClient(this@MainActivity),
                     servicesCatalogClient = ServicesCatalogClient(this@MainActivity)
                 )

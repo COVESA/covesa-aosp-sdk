@@ -1,6 +1,5 @@
 package global.covesa.sdk.client
 
-import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -22,7 +21,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    context: Context? = null,
+    pushUiState: PushUiState = PushUiState(),
     private val lightsServiceClient: LightsServiceClient,
     private val servicesCatalogClient: ServicesCatalogClient
 ) : ViewModel() {
@@ -32,7 +31,7 @@ class MainViewModel(
     var installedServicesUiState by mutableStateOf(InstalledServicesUiState())
         private set
 
-    var pushUiState by mutableStateOf(context?.let { PushUiState(it) } ?: PushUiState())
+    var pushUiState by mutableStateOf(pushUiState)
         private set
 
     init {
@@ -62,7 +61,8 @@ class MainViewModel(
         }
         viewModelScope.launch {
             PushServiceImpl.events.collect {
-                pushUiState = pushUiState.copy(registered = it.registered)
+                this@MainViewModel.pushUiState =
+                    this@MainViewModel.pushUiState.copy(registered = it.registered)
             }
         }
     }
