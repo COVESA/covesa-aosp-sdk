@@ -65,4 +65,4 @@ Note that selecting `ALL_ZONES` when invoking the method `setInternalLight()` of
 
 ### Push notifications
 In order to test your push notifications on a non-automotive emulator, you need to install a testing [distributor](https://unifiedpush.org/users/distributors/) app.
-For example, you can install [ntfy](https://unifiedpush.org/users/distributors/ntfy/) (also from Google Play Store). Simply open it and then run this client sample.
+For example, you can install [Sunup](https://codeberg.org/Sunup/android). Simply open it, grant the permissions, and then run this client sample.
