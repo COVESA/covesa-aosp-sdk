@@ -9,9 +9,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -28,11 +29,13 @@ import kotlin.random.Random
 fun MainUi(viewModel: MainViewModel) {
     val lightsUiState = viewModel.lightsUiState
     val installedServicesUiState = viewModel.installedServicesUiState
+    val pushUiState = viewModel.pushUiState
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background),
+            .background(MaterialTheme.colorScheme.background)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
@@ -44,6 +47,12 @@ fun MainUi(viewModel: MainViewModel) {
                 }
                 ?: "No COVESA services installed",
             modifier = Modifier.padding(top = 16.dp)
+        )
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 8.dp),
+            thickness = 1.dp,
+            color = Color.Gray
         )
 
         Text(
@@ -73,9 +82,50 @@ fun MainUi(viewModel: MainViewModel) {
         ) {
             Text(text = "Set internal lights")
         }
-
         if (lightsUiState.installedServiceVersion is LightServiceVersion.Installed) {
             LightStates(lightsUiState.lights)
+        }
+
+        HorizontalDivider(
+            modifier = Modifier.padding(vertical = 8.dp),
+            thickness = 1.dp,
+            color = Color.Gray
+        )
+
+        if (pushUiState.registered) {
+            Text(
+                text = "Registered to push service.",
+                modifier = Modifier.padding(top = 16.dp)
+            )
+            Button(
+                modifier = Modifier.padding(top = 32.dp),
+                onClick = {
+                    viewModel.unregisterPushService()
+                }
+            ) {
+                Text(text = "Unregister")
+            }
+            Button(
+                modifier = Modifier.padding(top = 32.dp),
+                onClick = {
+                    viewModel.sendPushNotification()
+                }
+            ) {
+                Text(text = "Notify")
+            }
+        } else {
+            Text(
+                text = "Not registered to push service.",
+                modifier = Modifier.padding(top = 16.dp)
+            )
+            Button(
+                modifier = Modifier.padding(top = 32.dp),
+                onClick = {
+                    viewModel.registerPushService()
+                }
+            ) {
+                Text(text = "Register")
+            }
         }
     }
 }
@@ -86,24 +136,18 @@ private fun LightStates(
     allLights: List<LightState>,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(
+    Column(
         modifier = modifier
-            .fillMaxSize()
+            .fillMaxWidth()
             .padding(horizontal = 8.dp)
     ) {
-        item {
-            Text(
-                text = "Current lights:\n",
-                style = MaterialTheme.typography.headlineSmall,
-                modifier = modifier
-            )
-        }
-        items(
-            items = allLights,
-            key = { it.zone },
-            contentType = { it }
-        ) {
-            LightStateRow(light = it)
+        Text(
+            text = "Current lights:\n",
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = modifier
+        )
+        allLights.forEach {
+            LightStateRow(it)
         }
     }
 }

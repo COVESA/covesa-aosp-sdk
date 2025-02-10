@@ -67,6 +67,8 @@ abstract class CovesaServiceClient<T>(
         } catch (e: IllegalStateException) {
             cancel("connection to remote service failed", e)
             Log.w(TAG, e.message, e)
+        } catch (e: Exception) {
+            Log.w(TAG, e.message, e)
         }
 
         awaitClose {
