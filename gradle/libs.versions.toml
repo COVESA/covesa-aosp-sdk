@@ -13,6 +13,7 @@ composeBom = "2024.02.02"
 unifiedpush = "3.0.0-rc3"
 volley = "1.2.1"
 tinkWebpush = "1.11.0"
+bouncy = "1.77"
 
 [libraries]
 agpGradleApi = { module = "com.android.tools.build:gradle-api", version.ref = "androidGradlePlugin" }
@@ -33,3 +34,4 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 unifiedpush = { group = "org.unifiedpush.android", name = "connector", version.ref = "unifiedpush"}
 volley = { group = "com.android.volley", name = "volley", version.ref = "volley" }
 tink-webpush = { group = "com.google.crypto.tink", name = "apps-webpush", version.ref = "tinkWebpush"}
+bouncy = { group = "org.bouncycastle", name = "bcprov-jdk18on", version.ref = "bouncy" }

@@ -2,6 +2,7 @@ package global.covesa.sdk.api.client.push
 
 import android.content.Context
 import android.util.AndroidException
+import android.util.Log
 import org.unifiedpush.android.connector.UnifiedPush
 
 /**
@@ -78,6 +79,7 @@ import org.unifiedpush.android.connector.UnifiedPush
  * It removes the distributor if this is the last instance to unregister.
  */
 object PushManager {
+    const val TAG = "PushManager"
     const val INSTANCE_DEFAULT = "default"
 
     /**
@@ -103,7 +105,9 @@ object PushManager {
     ) {
         try {
             UnifiedPush.registerApp(context, instance, messageForDistributor, vapid)
+            Log.w(TAG, "Registered with Vapid $vapid")
         } catch (e: UnifiedPush.VapidNotValidException) {
+            Log.w(TAG, "Error occurred while registering with Vapid $vapid: $e")
             throw VapidNotValidException()
         }
     }
@@ -121,6 +125,7 @@ object PushManager {
         instance: String = INSTANCE_DEFAULT,
     ) {
         UnifiedPush.unregisterApp(context, instance)
+        Log.w(TAG, "Unregistered Push Service.")
     }
 
     /**
@@ -128,8 +133,8 @@ object PushManager {
      *
      * @return The list of distributor's package name
      */
-    fun getDistributors(context: Context): List<String> {
-        return UnifiedPush.getDistributors(context)
+    fun getDistributors(context: Context): List<String> = UnifiedPush.getDistributors(context).also {
+        Log.w(TAG, "Distributors: $it.")
     }
 
     /**
@@ -162,6 +167,7 @@ object PushManager {
         callback: (Boolean) -> Unit,
     ) {
         UnifiedPush.tryUseDefaultDistributor(context, callback)
+        Log.w(TAG, "Trying to use default distributor.")
     }
 
     /**
@@ -194,6 +200,7 @@ object PushManager {
      * true if the registration using the deeplink succeeded.
      */
     fun tryUseCurrentOrDefaultDistributor(context: Context, callback: (Boolean) -> Unit) {
+        Log.w(TAG, "Trying to use current or default distributor.")
         return UnifiedPush.tryUseCurrentOrDefaultDistributor(context, callback)
     }
 
@@ -205,6 +212,7 @@ object PushManager {
      */
     fun saveDistributor(context: Context, distributor: String) {
         UnifiedPush.saveDistributor(context, distributor)
+        Log.w(TAG, "Saved distributor $distributor.")
     }
 
     /**
@@ -216,7 +224,9 @@ object PushManager {
      *
      * @return The distributor package name if any, else null
      */
-    fun getSavedDistributor(context: Context): String? = UnifiedPush.getSavedDistributor(context)
+    fun getSavedDistributor(context: Context): String? = UnifiedPush.getSavedDistributor(context).also {
+        Log.w(TAG, "Saved distributor: $it.")
+    }
 
     /**
      * Get the distributor registered by the user, and the
@@ -227,7 +237,9 @@ object PushManager {
      *
      * @return The distributor package name if any, else null
      */
-    fun getAckDistributor(context: Context): String? = UnifiedPush.getAckDistributor(context)
+    fun getAckDistributor(context: Context): String? = UnifiedPush.getAckDistributor(context).also {
+        Log.w(TAG, "AckDistributor: $it.")
+    }
 
 
     /**
@@ -235,7 +247,9 @@ object PushManager {
      *
      * @param [context] To interact with the shared preferences and send broadcast intents.
      */
-    fun removeDistributor(context: Context) = UnifiedPush.forceRemoveDistributor(context)
+    fun removeDistributor(context: Context) = UnifiedPush.forceRemoveDistributor(context).also {
+        Log.w(TAG, "Force removed distributor from $context.")
+    }
 
     /**
      * The VAPID public key is not in the right format.

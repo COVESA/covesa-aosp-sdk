@@ -83,19 +83,27 @@ class FakeApplicationServer(private val context: Context) {
          * Send a notification
          */
         fun sendNotification() {
-            sendWebPushNotification("This is a notification from server") { _, e ->
+            val content = "This is a notification from server"
+            sendWebPushNotification(content) { responseString, e ->
+                var message = ""
                 e?.let {
-                    Log.w(TAG, "An error occurred:", e)
+                    message = "An error occurred: $e with message ${e.cause?.localizedMessage}, data: ${e.networkResponse.data.decodeToString()} and code: ${e.networkResponse.statusCode}"
+                }
+                responseString?.let {
+                    message = "Notification sent with content: $content"
+                }
+                context.mainExecutor.execute {
+                    Log.i(TAG, message)
                 }
             }
         }
     }
 
-
     /**
      * Send a notification encrypted with RFC8291
      */
     private fun sendWebPushNotification(content: String, callback: (response: String?, error: VolleyError?) -> Unit) {
+        Log.w(TAG, "Sending WebPushNotification with content $content")
         val requestQueue: RequestQueue = Volley.newRequestQueue(context)
         val url = endpoint
         val request = object :
@@ -138,28 +146,25 @@ class FakeApplicationServer(private val context: Context) {
      *
      * @return [String] "vapid t=$JWT,k=$PUBKEY"
      */
-    private fun getVapidHeader(): String {
+    private fun getVapidHeader(userIdentifier: String = "covesa_sample_user"): String {
         val endpointStr = endpoint ?: return ""
         val header = JSONObject()
             .put("alg", "ES256")
             .put("typ", "JWT")
-            .toString().toByteArray(Charsets.UTF_8)
-            .b64encode()
+            .toString().toByteArray(Charsets.UTF_8).b64encode()
         val endpoint = URL(endpointStr)
-        val time12h = ((System.currentTimeMillis() / 1000) + 43200).toString() // +12h
+        val exp = ((System.currentTimeMillis() / 1000) + 43200) // +12h
 
         /**
          * [org.json.JSONStringer#string] Doesn't follow RFC, '/' = 0x2F doesn't have to be escaped
          */
         val body = JSONObject()
             .put("aud", "${endpoint.protocol}://${endpoint.authority}")
-            .put("exp", time12h)
-            .toString()
-            .replace("\\/", "/")
-            .toByteArray(Charsets.UTF_8)
-            .b64encode()
+            .put("exp", exp)
+            .put("sub", userIdentifier)
+            .toString().toByteArray(Charsets.UTF_8).b64encode()
         val toSign = "$header.$body".toByteArray(Charsets.UTF_8)
-        val signature = sign(toSign)?.b64encode() ?: ""
+        val signature = sign(toSign)?.b64encode()
         val jwt = "$header.$body.$signature"
         return "vapid t=$jwt,k=$vapidPubKey"
     }
@@ -201,11 +206,12 @@ class FakeApplicationServer(private val context: Context) {
             Log.w(TAG, "Not an instance of a PrivateKeyEntry")
             return null
         }
-        return Signature.getInstance("SHA256withECDSA").run {
+        val signature = Signature.getInstance("SHA256withECDSA").run {
             initSign(entry.privateKey)
             update(data)
             sign()
         }
+        return signature.convertSignatureDerToRawRS()
     }
 
     private companion object {
