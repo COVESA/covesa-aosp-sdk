@@ -37,6 +37,142 @@ Third-party apps should link to the same single library `implementation(project(
 
 There is no AIDL layer for push notifications. Instead of an AIDL-based system service, OEMs implement their own [distributor](https://unifiedpush.org/users/distributors/) which is reacting to a specific broadcast.
 
+In order to send/receive push notifications a distributor is needed. In this case, we are using Sunup in order to be able to test. Sunup is already doing some work for us, since Mozzilla push services are set by default. We also need some kind of service that handles the Web Pushes: send, receive, register a push service and unregister push service.
+
+Add the following dependency to your `build.gradle`:
+```
+(TBD)
+```
+
+Create a class that implements `PushService` from our SDK:
+```kotlin
+class PushServiceImpl: PushService() {
+    class NewRegistrationState(val registered: Boolean)
+
+    /**
+     * A new endpoint is to be used for sending push messages. The new endpoint
+     * should be send to the application server, and the app should sync for
+     * missing notifications.
+     */
+    override suspend fun onNewEndpoint(endpoint: PushEndpoint, instance: String) {
+        // TODO: Send the new endpoint to your web push server
+        updateRegistrationState(true)
+    }
+
+   /**
+     * A new message is received. The message contains the decrypted content of the push message
+     * for the instance
+     */
+    override suspend fun onMessage(message: PushMessage, instance: String) {
+        // TODO: Create and show a notification with the message received
+        updateRegistrationState(true)
+    }
+
+    /**
+     * The registration is not possible, eg. no network, depending on the reason,
+     * you can try to register again directly.
+     */
+    override suspend fun onRegistrationFailed(reason: FailedReason, instance: String) {
+      // TODO: Inform the user that the registration failed and therefore notifications
+      // are not available
+    }
+
+    /**
+     * This application is unregistered by the distributor from receiving push messages
+     */
+    override suspend fun onUnregistered(instance: String) {
+        // TODO: Send an unregister action to your web push server, removing the endpoint
+        updateRegistrationState(false)
+    }
+
+    /**
+     * Update the UI
+     */
+    private suspend fun updateRegistrationState(registered: Boolean) {
+        _events.emit(NewRegistrationState(registered))
+    }
+
+    companion object {
+        private const val TAG = "PushServiceImpl"
+        private val _events = MutableSharedFlow<NewRegistrationState>()
+        val events = _events.asSharedFlow()
+    }
+}
+```
+
+Add your `PushService` implementation to your manifest:
+```xml
+<service android:name="global.covesa.sdk.client.push.PushServiceImpl"
+    android:exported="true">
+    <intent-filter>
+        <action android:name="global.covesa.sdk.PUSH_EVENT"/>
+        <action android:name="org.unifiedpush.android.connector.RAISE_TO_FOREGROUND"/>
+    </intent-filter>
+</service>
+```
+
+### Working with PushManager
+The PushManager, as the name says, manages your app interactions with the push distributor. If you skip this step, your PushServiceImpl will never work.
+
+#### Register push service
+In order to register you need to get the distributor first, so your app knows who distributes the push you receive/send.
+To do that user the `tryUseCurrentOrDefaultDistributor` method from the `PushManager`:
+```kotlin
+PushManager.tryUseCurrentOrDefaultDistributor(activityContext) { success ->
+    // TODO: Next step
+}
+```
+With this method the SDK tries to use the saved distributor else, use the default distributor opening the deeplink "unifiedpush://link"
+It can be used on application startup to register to the distributor.
+If you had already registered to a distributor, this ensure the connection is working.
+If the previous distributor has been uninstalled, it will fallback to the user's default.
+If you register for the first time, it will use the user's default Distributor or the OS will ask what it should use.
+When a distributor is picked, you can then register:
+
+```kotlin
+PushManager.tryUseCurrentOrDefaultDistributor(activityContext) { success ->
+  if (success) {
+    val vapidPubKey = <Your vapid pub key>
+    try {
+        PushManager.register(
+            activity,
+            vapid = vapidPubKey
+        )
+        Log.w(TAG, "UnifiedPush registered with vapid $vapidPubKey")
+    } catch (e: PushManager.VapidNotValidException) {
+        Log.w(TAG, "UnifiedPush failed to register with vapid $vapidPubKey. With exception $e")
+    }
+  }
+}
+```
+
+#### Get systems available distributors
+```kotlin
+PushManager.getDistributors(context: Context) : List<String>
+```
+
+#### Save a new distributor
+```kotlin
+PushManager.saveDistributor(context: Context, distributor: String)
+```
+
+#### Get registered distributor
+Get the distributor registered by the user, but the distributor may not have respond yet to our requests. Most of the time getAckDistributor is preferred.
+```kotlin
+PushManager.getSavedDistributor(context: Context): String?
+```
+
+The preferred way:
+```kotlin
+PushManager.getAckDistributor(context: Context): String?
+```
+
+#### Remove distributor
+If you don't want to receive any more push notification, unregister the distributor
+```kotlin
+PushManager.removeDistributor(context: Context)
+```
+
 ## API Artifacts
 Both API libraries artifacts can be generated by using the following commands:
 
