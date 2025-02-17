@@ -205,4 +205,6 @@ The server sample acts both as a reference for car manufacturers but also it log
 
 ### Maintainers
 * Juhani Lehtimäki - Snapp Automotive
-* José Freitas - FORVIA
+* Nuno Palma - Appning
+* Rodrigo Fernandes - Appning
+* Viktor Mukha - Paradox Cat
