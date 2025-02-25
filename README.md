@@ -47,5 +47,4 @@ Third party app developers can test the library correct integration by installin
 The server sample acts both as a reference for car manufacturers but also it logs every request received by client apps and responds updating each registered listener in a realistic way. That can be used to test third party apps behavior.
 
 ### Maintainers
-* Juhani Lehtimäki - Snapp Automotive
 * José Freitas - FORVIA
