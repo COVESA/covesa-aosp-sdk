@@ -21,7 +21,6 @@ dependencies {
     /** Used by the [FakeApplicationServer][global.covesa.sdk.client.push.FakeApplicationServer] */
     implementation(libs.volley)
     implementation(libs.tink.webpush)
-    implementation(libs.bouncy)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

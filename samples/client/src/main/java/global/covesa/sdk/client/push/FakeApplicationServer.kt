@@ -10,6 +10,7 @@ import com.android.volley.VolleyError
 import com.android.volley.toolbox.StringRequest
 import com.android.volley.toolbox.Volley
 import com.google.crypto.tink.apps.webpush.WebPushHybridEncrypt
+import com.google.crypto.tink.subtle.EllipticCurves
 import global.covesa.sdk.api.client.push.data.PushEndpoint
 import org.json.JSONObject
 import java.net.URL
@@ -146,7 +147,7 @@ class FakeApplicationServer(private val context: Context) {
      *
      * @return [String] "vapid t=$JWT,k=$PUBKEY"
      */
-    private fun getVapidHeader(userIdentifier: String = "covesa_sample_user"): String {
+    private fun getVapidHeader(sub: String = "mailto"): String {
         val endpointStr = endpoint ?: return ""
         val header = JSONObject()
             .put("alg", "ES256")
@@ -161,7 +162,7 @@ class FakeApplicationServer(private val context: Context) {
         val body = JSONObject()
             .put("aud", "${endpoint.protocol}://${endpoint.authority}")
             .put("exp", exp)
-            .put("sub", userIdentifier)
+            .put("sub", sub)
             .toString().toByteArray(Charsets.UTF_8).b64encode()
         val toSign = "$header.$body".toByteArray(Charsets.UTF_8)
         val signature = sign(toSign)?.b64encode()
@@ -210,8 +211,8 @@ class FakeApplicationServer(private val context: Context) {
             initSign(entry.privateKey)
             update(data)
             sign()
-        }
-        return signature.convertSignatureDerToRawRS()
+        }.let { EllipticCurves.ecdsaDer2Ieee(it, 64) }
+        return signature
     }
 
     private companion object {
