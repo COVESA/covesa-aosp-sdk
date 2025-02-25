@@ -94,7 +94,7 @@ fun MainUi(viewModel: MainViewModel) {
 
         if (pushUiState.registered) {
             Text(
-                text = "Registered to push service.",
+                text = "Registered to push service ${pushUiState.pushDistributor}.",
                 modifier = Modifier.padding(top = 16.dp)
             )
             Button(
