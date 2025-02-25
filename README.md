@@ -105,10 +105,9 @@ class PushServiceImpl: PushService() {
 Add your `PushService` implementation to your manifest:
 ```xml
 <service android:name="global.covesa.sdk.client.push.PushServiceImpl"
-    android:exported="true">
+    android:exported="false">
     <intent-filter>
         <action android:name="global.covesa.sdk.PUSH_EVENT"/>
-        <action android:name="org.unifiedpush.android.connector.RAISE_TO_FOREGROUND"/>
     </intent-filter>
 </service>
 ```
