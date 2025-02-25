@@ -1,6 +1,7 @@
 # COVESA SDK Client sample
 
 This first version of the COVESA SDK client sample shows how to use the COVESA Lights Service to update the values of internal lights and receive and updated state of all the lights.
+It also demonstrates how to use push notifications.
 
 ## Client SDK artifacts
 The client SDK library is composed (at the moment) of two AAR files: `aidl-debug.aar` and `client-debug.aar`.
@@ -13,6 +14,7 @@ It is the service that informs a client at runtime about the other installed COV
 
 It can be created with a Context constructor parameter and it exposes the following:
 - `getInstalledServices()` returns a list of String, each one representing the action needed to connect to a supported COVESA Service via Intent.
+  Note that `PushService` for push notifications is a service implemented by applications and it is hence not exposed here.
 - `getServiceApiVersion()` returns a nullable Int specifying the API level exposed by the service or `null` if the service is not installed
 
 ## Lights Client API
@@ -60,3 +62,7 @@ When tapping on the "Set internal lights" button, the SDK will connect to the li
 This will be reflected in the Toast triggered by the service and by a callback updating the client UI.
 
 Note that selecting `ALL_ZONES` when invoking the method `setInternalLight()` of Light Service, will override all other zones lights.
+
+### Push notifications
+In order to test your push notifications on a non-automotive emulator, you need to install a testing [distributor](https://unifiedpush.org/users/distributors/) app.
+For example, you can install [Sunup](https://codeberg.org/Sunup/android). Simply open it, grant the permissions, and then run this client sample.
