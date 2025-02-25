@@ -37,7 +37,9 @@ Third-party apps should link to the same single library `implementation(project(
 
 There is no AIDL layer for push notifications. Instead of an AIDL-based system service, OEMs implement their own [distributor](https://unifiedpush.org/users/distributors/) which is reacting to a specific broadcast.
 
-In order to send/receive push notifications a distributor is needed. In this case, we are using Sunup in order to be able to test. Sunup is already doing some work for us, since Mozzilla push services are set by default. We also need some kind of service that handles the Web Pushes: send, receive, register a push service and unregister push service.
+In order to send/receive push notifications a distributor is needed. In this case, we are using Sunup in order to be able to test. Sunup is already doing some work for us, since Mozilla push services are set by default.
+
+Push notifications are sent by the application server. Therefore the mobile application registers the push endpoint, and the encryption keys to this server.
 
 Add the following dependency to your `build.gradle`:
 ```
