@@ -1,5 +1,6 @@
 package global.covesa.sdk.client
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -7,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import global.covesa.sdk.api.client.LightsServiceClient
 import global.covesa.sdk.api.client.ServicesCatalogClient
+import global.covesa.sdk.api.client.push.PushManager
 import global.covesa.sdk.api.lights.LightState
 import global.covesa.sdk.client.push.ActionEvent
 import global.covesa.sdk.client.push.PushServiceImpl
@@ -35,18 +37,15 @@ class MainViewModel(
         private set
 
     init {
-        lightsServiceClient.lightsStates
-            .onEach { updatedLightsList ->
+        lightsServiceClient.lightsStates.onEach { updatedLightsList ->
                 lightsUiState = lightsUiState.copy(lights = updatedLightsList.toImmutableList())
-            }
-            .launchIn(viewModelScope)
+        }.launchIn(viewModelScope)
 
         viewModelScope.launch {
-            installedServicesUiState = installedServicesUiState.copy(
-                installedServices = servicesCatalogClient.getInstalledServices()
-                    .map { action -> InstalledService(action) }
-                    .toImmutableList()
-            )
+            installedServicesUiState =
+                installedServicesUiState.copy(installedServices = servicesCatalogClient.getInstalledServices()
+                    .map { action -> InstalledService(action) }.toImmutableList()
+                )
         }
 
         viewModelScope.launch {
@@ -59,10 +58,16 @@ class MainViewModel(
                 }
             )
         }
+    }
+
+    fun listenForRegisterChanges(context: Context) {
         viewModelScope.launch {
-            PushServiceImpl.events.collect {
-                this@MainViewModel.pushUiState =
-                    this@MainViewModel.pushUiState.copy(registered = it.registered)
+            PushServiceImpl.events.collect { state ->
+                this@MainViewModel.pushUiState = this@MainViewModel.pushUiState.copy(
+                    registered = state.registered,
+                    pushDistributor = PushManager.getAckDistributor(context).toString(),
+                    savedDistributor = PushManager.getSavedDistributor(context).toString(),
+                )
             }
         }
     }
@@ -90,5 +95,15 @@ class MainViewModel(
             ActionEvent.emit(ActionEvent(ActionEvent.Type.UnregisterPush))
             pushUiState = pushUiState.copy(registered = false)
         }
+    }
+
+    fun selectDistributor(distributor: String) {
+        pushUiState = pushUiState.copy(selectedDistributor = distributor)
+    }
+
+    fun saveDistributor(context: Context) {
+        val distributor = pushUiState.selectedDistributor
+        PushManager.saveDistributor(context, distributor)
+        pushUiState = pushUiState.copy(savedDistributor = distributor)
     }
 }

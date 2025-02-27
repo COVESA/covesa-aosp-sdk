@@ -24,22 +24,32 @@ class ActionEvent(private val type: Type) {
 
     private fun registerPush(activity: Activity) {
         Log.w(TAG,"Registering push on $activity")
-        PushManager.tryUseCurrentOrDefaultDistributor(
-            activity
-        ) { success ->
-            Log.d(TAG, "Using")
-            if (success) {
-                val vapidPubKey = FakeApplicationServer(activity).MockApi().getVapidPubKey()
-                try {
-                    PushManager.register(
-                        activity,
-                        vapid = vapidPubKey
-                    )
-                    Log.w(TAG, "UnifiedPush registered successfully.")
-                } catch (e: PushManager.VapidNotValidException) {
-                    Log.w(TAG, "UnifiedPush failed to register with exception $e")
+        if (PushManager.getSavedDistributor(activity) != null) {
+            Log.d(TAG, "Using saved distributor")
+            doRegistration(activity)
+        } else {
+            PushManager.tryUseCurrentOrDefaultDistributor(
+                activity
+            ) { success ->
+                Log.d(TAG, "Using current or default distributor")
+                if (success) {
+                    doRegistration(activity)
                 }
             }
+        }
+    }
+
+    private fun doRegistration(activity: Activity) {
+        val vapidPubKey = FakeApplicationServer(activity).MockApi().getVapidPubKey()
+        try {
+            PushManager.register(
+                activity,
+                vapid = vapidPubKey
+            )
+            Log.w(TAG, "UnifiedPush registered successfully.")
+        } catch (e: PushManager.VapidNotValidException) {
+            Log.w(TAG, "UnifiedPush failed to register with exception $e")
+            throw e
         }
     }
 
