@@ -64,5 +64,5 @@ This will be reflected in the Toast triggered by the service and by a callback u
 Note that selecting `ALL_ZONES` when invoking the method `setInternalLight()` of Light Service, will override all other zones lights.
 
 ### Push notifications
-In order to test your push notifications on a non-automotive emulator, you need to install a testing [distributor](https://unifiedpush.org/users/distributors/) app.
-For example, you can install [Sunup](https://codeberg.org/Sunup/android). Simply open it, grant the permissions, and then run this client sample.
+In order to test your push notifications, you need to install a testing [distributor](https://unifiedpush.org/users/distributors/) app.
+For testing purposes, you can install [Sunup](https://codeberg.org/Sunup/android). Simply open it, grant the permissions, and then run this client sample.
