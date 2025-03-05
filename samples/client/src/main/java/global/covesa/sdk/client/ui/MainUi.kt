@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -19,10 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import global.covesa.sdk.api.lights.LightColor
 import global.covesa.sdk.api.lights.LightState
 import global.covesa.sdk.client.MainViewModel
+import global.covesa.sdk.client.ui.composables.GenericSpinner
 import kotlin.random.Random
 
 @Composable
@@ -30,7 +34,8 @@ fun MainUi(viewModel: MainViewModel) {
     val lightsUiState = viewModel.lightsUiState
     val installedServicesUiState = viewModel.installedServicesUiState
     val pushUiState = viewModel.pushUiState
-
+    val context = LocalContext.current
+    viewModel.listenForRegisterChanges(context)
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -118,6 +123,25 @@ fun MainUi(viewModel: MainViewModel) {
                 text = "Not registered to push service.",
                 modifier = Modifier.padding(top = 16.dp)
             )
+            if (pushUiState.availableDistributors.size > 1) {
+                Spacer(modifier = Modifier.height(6.dp))
+                GenericSpinner(
+                    title = "Select a distributor: ",
+                    selectedItem = pushUiState.selectedDistributor,
+                    entriesList = pushUiState.availableDistributors
+                ) {
+                    viewModel.selectDistributor(it)
+                }
+                Button(
+                    modifier = Modifier.padding(top = 16.dp),
+                    enabled = pushUiState.savedDistributor != pushUiState.selectedDistributor,
+                    onClick = {
+                        viewModel.saveDistributor(context)
+                    }
+                ) {
+                    Text(text = "Save Distributor")
+                }
+            }
             Button(
                 modifier = Modifier.padding(top = 32.dp),
                 onClick = {
